@@ -55,3 +55,25 @@ class BlobStoreImage(db.Model):
     image_path = db.StringProperty(verbose_name=_('Image Path'),default='',indexed=False)
     update = db.DateTimeProperty(verbose_name=_('Update'),auto_now=True)
     created = db.DateTimeProperty(verbose_name=_('Created'),auto_now_add=True)
+
+class JLeagueTeam(db.Model):
+    team_name = db.StringProperty(verbose_name=_('Team Name'),default='',indexed=False)
+    team_id = db.StringProperty(verbose_name=_('Team ID'),default='',indexed=False)
+    j_class = db.StringProperty(verbose_name=_('J Class'),choices=('J1','J2'))
+    update = db.DateTimeProperty(verbose_name=_('Update'),auto_now=True)
+    created = db.DateTimeProperty(verbose_name=_('Created'),auto_now_add=True)
+
+class JLeagueRank(db.Model):
+    team = db.ReferenceProperty(JLeagueTeam)
+    year = db.StringProperty(verbose_name=_('Year,Seson'),default='')
+    rank = db.IntegerProperty(verbose_name=_('Rank'))
+    point = db.IntegerProperty(verbose_name=_('Point'))
+    game_count = db.IntegerProperty(verbose_name=_('Game Count'))
+    win_count = db.IntegerProperty(verbose_name=_('Win Count'))
+    draw_count = db.IntegerProperty(verbose_name=_('Draw Count'))
+    lose_count = db.IntegerProperty(verbose_name=_('Lose Count'))
+    goal_get = db.IntegerProperty(verbose_name=_('Goal Get'))
+    goal_lost = db.IntegerProperty(verbose_name=_('Goal Lost'))
+    goal_point = db.IntegerProperty(verbose_name=_('Goal Point'))
+    update = db.DateTimeProperty(verbose_name=_('Update'),auto_now=True)
+    created = db.DateTimeProperty(verbose_name=_('Created'),auto_now_add=True)

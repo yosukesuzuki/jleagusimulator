@@ -50,7 +50,7 @@ from kay.auth.decorators import admin_required
 from kay.handlers import blobstore_handlers
 
 from mainapp.views import CACHE_NAME_FOR_TOP_PAGE_RESULTS,MODEL_DICT,get_page_content
-from mainapp.models import AdminPage,BlobStoreImage,Article
+from mainapp.models import AdminPage,BlobStoreImage,Article,JLeagueTeam,JLeagueRank
 from adminapp.forms import AdminPageForm
 from adminapp.utils import construct_datetime_from_string,construct_image_json_from_content
 
@@ -255,3 +255,40 @@ def image_delete(request,key):
     bsi_entity.blob_key.delete()
     bsi_entity.delete()
     return Response('success')
+
+def insert_team_data():
+    from adminapp.globalvars import TEAM_DATA_RAW
+    for r in re.split("\n",TEAM_DATA_RAW):
+        logging.info(r)
+        cells = r.split(';')
+        entity = JLeagueTeam.get_by_key_name(cells[1])
+        if entity:
+            continue
+        entity = JLeagueTeam(key_name=cells[1],team_name=cells[1],team_id=cells[0],j_class=cells[2])
+        entity.put()
+
+def insert_rank_data():
+    from adminapp.globalvars import J1_RESULT_2013 
+    for r in re.split("\n",J1_RESULT_2013):
+        cells = r.split(';')
+        team = JLeagueTeam.get_by_key_name(cells[1])
+        entity = JLeagueRank(key_name=team.team_id+'2013',
+               team=team,
+               year='2013',
+               rank=int(cells[0]),
+               point=int(cells[2]),
+               game_count=int(cells[3]),
+               win_count=int(cells[4]),
+               draw_count=int(cells[5]),
+               lose_count=int(cells[6]),
+               goal_get=int(cells[7]),
+               goal_lost=int(cells[8]),
+               goal_point=int(cells[9]),
+               )
+        entity.put()
+
+def insert_team(request):
+    insert_team_data()
+    insert_rank_data()
+    return Response('ok')
+    

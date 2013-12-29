@@ -118,6 +118,7 @@ view_groups = [
     Rule('/image/upload/url/', endpoint='image_upload_url', view='adminapp.views.image_upload_url'),
     Rule('/image/upload/handler/', endpoint='upload_handler', view=('adminapp.views.UploadHandler', (), {})),
     Rule('/image/delete/<string:key>', endpoint='image_delete', view='adminapp.views.image_delete'),
+    Rule('/insert/team/', endpoint='insert_team', view='adminapp.views.insert_team'),
   ),
   AdminPageCRUDViewGroup(),
   ArticleCRUDViewGroup(),
