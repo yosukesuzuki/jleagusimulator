@@ -30,6 +30,9 @@ import werkzeug
 import re
 import datetime
 import time
+import lxml.html
+import unicodedata
+
 RE_REMOVE_HTTP = re.compile(ur'^http:')
 from werkzeug import Response
 
@@ -40,6 +43,7 @@ from google.appengine.ext import db
 from google.appengine.ext import blobstore
 from google.appengine.ext import deferred
 from google.appengine.api.images import get_serving_url
+from google.appengine.api import urlfetch
 
 from kay import utils
 from kay.utils import render_to_response
@@ -49,8 +53,10 @@ from kay.i18n import gettext as _
 from kay.auth.decorators import admin_required
 from kay.handlers import blobstore_handlers
 
+from pyquery import PyQuery as pq
+
 from mainapp.views import CACHE_NAME_FOR_TOP_PAGE_RESULTS,MODEL_DICT,get_page_content
-from mainapp.models import AdminPage,BlobStoreImage,Article,JLeagueTeam,JLeagueRank
+from mainapp.models import AdminPage,BlobStoreImage,Article,JLeagueTeam,JLeagueRank,JPlayerData
 from adminapp.forms import AdminPageForm
 from adminapp.utils import construct_datetime_from_string,construct_image_json_from_content
 
@@ -264,7 +270,11 @@ def insert_team_data():
         entity = JLeagueTeam.get_by_key_name(cells[1])
         if entity:
             continue
-        entity = JLeagueTeam(key_name=cells[1],team_name=cells[1],team_id=cells[0],j_class=cells[2])
+        entity = JLeagueTeam(key_name=cells[1],
+                team_name=cells[1],
+                team_short_name=cells[2],
+                team_id=cells[0],
+                j_class=cells[3])
         entity.put()
 
 def insert_rank_data():
@@ -291,4 +301,59 @@ def insert_team(request):
     insert_team_data()
     insert_rank_data()
     return Response('ok')
-    
+
+def get_short_name_dic():
+    results = JLeagueTeam.all().fetch(1000)
+    return_dic = {}
+    for r in results:
+        return_dic[r.team_short_name] = r.key().name()
+    return return_dic
+
+def parse_trade_info(url):
+    html_string = unicode(urlfetch.fetch(url=url,deadline=60).content,'shift-jis')
+    query = pq(html_string)
+    team_name_re = re.compile(ur'[［］\[←\] 　]')
+    short_name_dic = get_short_name_dic()
+    logging.info(short_name_dic)
+    for e in query.find('div.field'):
+        team_name = unicodedata.normalize('NFKC',team_name_re.sub('',pq(e).find('img').attr('alt')))
+        logging.info(u'team name:'+team_name)
+        team = JLeagueTeam.get_by_key_name(team_name)
+        new_team = team.key().name()
+        new_players = pq(e).find('table.leftPlayer')
+        for r in new_players.find('td.nameCell'):
+            player_name = team_name_re.sub('',pq(r).find('a').text())
+            logging.info(player_name)
+            player_from = unicodedata.normalize('NFKC',team_name_re.sub('',pq(r).find('div').text()))
+            #logging.info(player_from)
+            if '/' in player_from:
+                temp_arr = player_from.split('/')
+                player_from = temp_arr[0]
+                trade_comment = temp_arr[1]
+            else:
+                trade_comment = ''
+            if player_from in short_name_dic:
+                old_team = short_name_dic[player_from]
+            else:
+                old_team = player_from
+            logging.info(u'new team:'+new_team)
+            logging.info(u'old team:'+old_team)
+            key_name = old_team + player_name
+            entity = JPlayerData.get_by_key_name(key_name)
+            if entity is None:
+                entity = JPlayerData(key_name=key_name,
+                        year='2013-2014',
+                        player_name=player_name,
+                        new_team=new_team,
+                        old_team=old_team,
+                        trade_comment=trade_comment)
+                entity.put()
+
+def check_trade_data(request):
+    base_url = 'http://www.jsgoal.jp/special/2013move/?c=j1'
+    parse_trade_info(base_url)
+    #results = JLeagueTeam.all().fetch(1000)
+    #for r in results:
+    #    url = base_url + r.team_id
+    #    parse_trade_info(url)
+    return Response('ok')
