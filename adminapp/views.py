@@ -343,7 +343,7 @@ def parse_trade_info(url):
             if entity is None:
                 entity = JPlayerData(key_name=key_name,
                         year='2013-2014',
-                        player_name=player_name,
+                        title=player_name,
                         new_team=new_team,
                         old_team=old_team,
                         trade_comment=trade_comment)

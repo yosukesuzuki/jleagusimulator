@@ -19,10 +19,10 @@ from kay.generics import admin_required
 from kay.generics.rest import RESTViewGroup
 from settings import DEFAULT_LANG
 
-from adminapp.forms import AdminPageForm,ArticleForm
+from adminapp.forms import AdminPageForm,ArticleForm,JPlayerDataForm
 from adminapp.views import index_full_text_search,index_full_text_search_by_key_name
 from adminapp.utils import construct_datetime_from_string,construct_image_json_from_content
-from mainapp.models import AdminPage,BlobStoreImage,Article
+from mainapp.models import AdminPage,BlobStoreImage,Article,JPlayerData
 from mainapp.views import CACHE_NAME_FOR_TOP_PAGE_RESULTS
 
 class AdminPageCRUDViewGroup(crud.CRUDViewGroup):
@@ -101,6 +101,18 @@ class ArticleCRUDViewGroup(crud.CRUDViewGroup):
          return {'key_name':key_name,'images':image_list,'lang':DEFAULT_LANG,'tags':tag_list,'display_time':display_time}
      authorize = admin_required
 
+class JPlayerDataCRUDViewGroup(crud.CRUDViewGroup):
+     entities_per_page = 20 
+     model = JPlayerData 
+     form = JPlayerDataForm
+     templates = {
+             'show':'adminapp/general_show.html',
+             'list':'adminapp/general_list_jplayerdata.html',
+             'update':'adminapp/general_update.html',
+             }
+     def get_query(self, request):
+         return self.model.all().order('-update')
+
 class AdminModelsRESTViewGroup(RESTViewGroup):
       models = ['mainapp.models.BlobStoreImage','mainapp.models.AdminPage','mainapp.models.Article']
 
@@ -123,5 +135,6 @@ view_groups = [
   ),
   AdminPageCRUDViewGroup(),
   ArticleCRUDViewGroup(),
+  JPlayerDataCRUDViewGroup(),
 ]
 
