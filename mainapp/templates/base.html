@@ -45,6 +45,7 @@
                     <a class="navbar-brand" href="/">KayBootstrap</a>
                 </div>
                 <div class="navbar-collapse collapse">
+                    {#
                     <ul class="nav navbar-nav">
                         <li><a href="/article/">{{_('News')}}</a></li>
                         <li><a href="#">{{_('Popular')}}</a></li>
@@ -77,6 +78,7 @@
                         </ul>
                         </li>
                     </ul>
+                    #}
                     {% if request.user.is_admin %}
                     <ul class="nav navbar-nav navbar-right">
                         <li class="active"><a href="/admin/"><i class="icon-wrench icon-white"></i>{{_('Admin')}}</a></li>

@@ -111,7 +111,7 @@ class JPlayerDataCRUDViewGroup(crud.CRUDViewGroup):
              'update':'adminapp/general_update.html',
              }
      def get_query(self, request):
-         return self.model.all().order('-update')
+         return self.model.all().order('update')
 
 class AdminModelsRESTViewGroup(RESTViewGroup):
       models = ['mainapp.models.BlobStoreImage','mainapp.models.AdminPage','mainapp.models.Article']
