@@ -48,3 +48,16 @@ indexes:
   - name: lang
   - name: display_time
     direction: desc
+
+- kind: JPlayerData
+  properties:
+  - name: display_page_flg
+  - name: update
+    direction: desc
+
+- kind: JPlayerData
+  properties:
+  - name: display_page_flg
+    direction: desc
+  - name: update
+    direction: desc

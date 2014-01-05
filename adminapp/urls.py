@@ -102,7 +102,7 @@ class ArticleCRUDViewGroup(crud.CRUDViewGroup):
      authorize = admin_required
 
 class JPlayerDataCRUDViewGroup(crud.CRUDViewGroup):
-     entities_per_page = 20 
+     entities_per_page = 100
      model = JPlayerData 
      form = JPlayerDataForm
      templates = {
@@ -111,7 +111,7 @@ class JPlayerDataCRUDViewGroup(crud.CRUDViewGroup):
              'update':'adminapp/general_update.html',
              }
      def get_query(self, request):
-         return self.model.all().order('update')
+         return self.model.all().order('-update')
 
 class AdminModelsRESTViewGroup(RESTViewGroup):
       models = ['mainapp.models.BlobStoreImage','mainapp.models.AdminPage','mainapp.models.Article']

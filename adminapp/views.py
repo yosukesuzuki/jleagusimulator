@@ -312,32 +312,24 @@ def get_short_name_dic():
 def parse_trade_info(url):
     html_string = unicode(urlfetch.fetch(url=url,deadline=60).content,'shift-jis')
     query = pq(html_string)
-    team_name_re = re.compile(ur'[［］\[←\] 　]')
+    team_name_re = re.compile(ur'[［］\[←→\] 　]')
     short_name_dic = get_short_name_dic()
-    logging.info(short_name_dic)
     for e in query.find('div.field'):
         team_name = unicodedata.normalize('NFKC',team_name_re.sub('',pq(e).find('img').attr('alt')))
-        logging.info(u'team name:'+team_name)
         team = JLeagueTeam.get_by_key_name(team_name)
         new_team = team.key().name()
         new_players = pq(e).find('table.leftPlayer')
         for r in new_players.find('td.nameCell'):
+            trade_comment = ''
             player_name = team_name_re.sub('',pq(r).find('a').text())
-            logging.info(player_name)
             player_from = unicodedata.normalize('NFKC',team_name_re.sub('',pq(r).find('div').text()))
-            #logging.info(player_from)
+            old_team = player_from
             if '/' in player_from:
                 temp_arr = player_from.split('/')
                 player_from = temp_arr[0]
                 trade_comment = temp_arr[1]
-            else:
-                trade_comment = ''
             if player_from in short_name_dic:
                 old_team = short_name_dic[player_from]
-            else:
-                old_team = player_from
-            logging.info(u'new team:'+new_team)
-            logging.info(u'old team:'+old_team)
             key_name = old_team + player_name
             entity = JPlayerData.get_by_key_name(key_name)
             if entity is None:
@@ -348,6 +340,36 @@ def parse_trade_info(url):
                         old_team=old_team,
                         trade_comment=trade_comment)
                 entity.put()
+        old_players = pq(e).find('table.rightPlayer')
+        for r in old_players.find('td.nameCell'):
+            trade_comment = ''
+            player_name = team_name_re.sub('',pq(r).find('a').text())
+            player_from = unicodedata.normalize('NFKC',team_name_re.sub('',pq(r).find('div').text()))
+            old_team = team_name_re.sub('',player_from)
+            if '/' in player_from:
+                temp_arr = player_from.split('/')
+                old_team = temp_arr[0]
+                trade_comment = temp_arr[1]
+            if player_from in short_name_dic:
+                old_team = short_name_dic[player_from]
+            key_name = new_team + player_name
+            entity = JPlayerData.get_by_key_name(key_name)
+            if entity is None:
+                entity = JPlayerData(key_name=key_name,
+                        year='2013-2014',
+                        title=player_name,
+                        new_team=old_team,
+                        old_team=new_team,
+                        trade_comment=trade_comment)
+                entity.put()
+            else:
+                if entity.new_team == u'未確定' and old_team != u'未確定':
+                    entity.new_team = old_team
+                    entity.put()
+                if u'→' in entity.new_team:
+                    entity.new_team = old_team
+                    entity.put()
+
 
 def check_trade_data(request):
     base_url = 'http://www.jsgoal.jp/special/2013move/?c=j1'
