@@ -61,3 +61,9 @@ indexes:
     direction: desc
   - name: update
     direction: desc
+
+- kind: JPlayerData
+  properties:
+  - name: player_type
+  - name: update
+    direction: desc

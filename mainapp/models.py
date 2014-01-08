@@ -96,6 +96,7 @@ class JPlayerData(db.Model):
     tackle = db.IntegerProperty(verbose_name=_(u'タックル'),default=0)
     clear = db.IntegerProperty(verbose_name=_(u'クリア'),default=0)
     intercept = db.IntegerProperty(verbose_name=_(u'インターセプト'),default=0)
+    goal_lost = db.IntegerProperty(verbose_name=_(u'失点'),default=0)
     save_count = db.IntegerProperty(verbose_name=_(u'セーブ数'),default=0)
     save_ratio = db.FloatProperty(verbose_name=_(u'セーブ率'),default=0.0)
     catch = db.IntegerProperty(verbose_name=_(u'キャッチ'),default=0)
