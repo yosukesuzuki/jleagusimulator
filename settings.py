@@ -37,11 +37,13 @@ INSTALLED_APPS = (
         'kay.auth',
         'kay.i18n',
         'mainapp',
+        'vapp',
         'adminapp',
 )
 
 APP_MOUNT_POINTS = {
         'mainapp':'/',
+        'vapp':'/v',
         'adminapp':'/admin',
 }
 

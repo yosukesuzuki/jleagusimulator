@@ -1,0 +1,117 @@
+{% extends "mainapp/base.html"%}
+{% block title %}{% endblock %}
+{% block description %}{% endblock %}
+{% block content %}
+
+<style>
+#chart {
+  height: 500px;
+}
+.node rect {
+  cursor: move;
+  fill-opacity: .9;
+  shape-rendering: crispEdges;
+}
+.node text {
+  pointer-events: none;
+  text-shadow: 0 1px 0 #fff;
+}
+.link {
+  fill: none;
+  stroke: #000;
+  stroke-opacity: .2;
+}
+.link:hover {
+  stroke-opacity: .5;
+}
+</style>
+
+<p id="chart">
+
+{% endblock %}
+{%block scripts%}
+<script src="http://d3js.org/d3.v2.min.js?2.9.1"></script>
+<script src="/media/js/sankey.js"></script>
+<script>
+
+var margin = {top: 1, right: 1, bottom: 6, left: 1},
+    width = 660 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var formatNumber = d3.format(",.0f"),
+    format = function(d) { return formatNumber(d); },
+    color = d3.scale.category20();
+
+var svg = d3.select("#chart").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var sankey = d3.sankey()
+    .nodeWidth(15)
+    .nodePadding(10)
+    .size([width, height]);
+
+var path = sankey.link();
+
+//d3.json("../ergast_championship_nodelist/", function(energy) {
+True=true
+False=false
+energy={"directed": true, "graph": [], "nodes": [{"name": "Open University ", "id": 0}, {"name": "Shropshire Council", "id": 1}, {"name": "OPEN UNIVERSITY ", "id": 2}, {"name": "Leeds City Council", "id": 3}, {"name": "Manchester City Council", "id": 4}, {"name": "City of Westminster", "id": 5}, {"name": "Worcestershire County Council", "id": 6}, {"name": "London Borough of Hillingdon", "id": 7}, {"name": "Norfolk County Council", "id": 8}, {"name": "Barnsley Borough Council", "id": 9}, {"name": "Newcastle upon Tyne City Council", "id": 10}, {"name": "Derbyshire County Council", "id": 11}, {"name": "OPEN UNIVERSITY FINANCE DIVISION ", "id": 12}, {"name": "Nottinghamshire County Council", "id": 13}, {"name": "OPEN UNIVERSITY, FINANCE DIVISION ", "id": 14}, {"name": "Bristol City Council", "id": 15}, {"name": "THE OPEN UNIVERSITY ", "id": 16}, {"name": "Coventry City Council", "id": 17}, {"name": "London Borough of Brent", "id": 18}, {"name": "Kent County Council", "id": 19}, {"name": "The Open University ", "id": 20}, {"name": "Trafford Council", "id": 21}, {"name": "Warrington Council", "id": 22}, {"name": "Somerset County Council", "id": 23}, {"name": "Spelthorne Borough Council", "id": 24}, {"name": "Royal Borough of Windsor and Maidenhead", "id": 25}, {"name": "London Borough of Bromley", "id": 26}, {"name": "Surrey County Council", "id": 27}, {"name": "Cornwall Council", "id": 28}, {"name": "Lancashire County Council", "id": 29}, {"name": "Brighton and Hove City Council", "id": 30}, {"name": "Cambridgeshire County Council", "id": 31}, {"name": "London Borough of Redbridge", "id": 32}, {"name": "Hull City Council", "id": 33}, {"name": "Hampshire County Council", "id": 34}, {"name": "Heritage Lottery Fund", "id": 35}, {"name": "Cambridge City Council", "id": 36}, {"name": "THE OPEN UNIVERSITY FINANCE DIVISIO ", "id": 37}, {"name": "Buckinghamshire County Council", "id": 38}], "links": [{"source": 1, "target": 0, "value": 5200.0}, {"source": 3, "target": 2, "value": 5850.0}, {"source": 4, "target": 0, "value": 8440.0}, {"source": 5, "target": 2, "value": 12105.0}, {"source": 6, "target": 16, "value": 12750.0}, {"source": 6, "target": 2, "value": 19080.0}, {"source": 7, "target": 2, "value": 13400.0}, {"source": 8, "target": 0, "value": 23375.0}, {"source": 9, "target": 2, "value": 54750.0}, {"source": 10, "target": 2, "value": 9040.0}, {"source": 11, "target": 0, "value": 77530.0}, {"source": 13, "target": 12, "value": 49610.0}, {"source": 15, "target": 14, "value": 7228.0}, {"source": 17, "target": 16, "value": 5545.0}, {"source": 18, "target": 16, "value": 3540.0}, {"source": 19, "target": 16, "value": 3965.0}, {"source": 21, "target": 20, "value": 6458.0}, {"source": 22, "target": 20, "value": 15550.0}, {"source": 23, "target": 16, "value": 42070.0}, {"source": 24, "target": 16, "value": 3555.0}, {"source": 25, "target": 20, "value": 6558.0}, {"source": 26, "target": 16, "value": 9930.0}, {"source": 27, "target": 20, "value": 3685.0}, {"source": 28, "target": 16, "value": 13380.0}, {"source": 29, "target": 16, "value": 7873.0}, {"source": 30, "target": 20, "value": 16800.0}, {"source": 31, "target": 20, "value": 40990.0}, {"source": 32, "target": 16, "value": 5980.0}, {"source": 33, "target": 16, "value": 4095.0}, {"source": 34, "target": 16, "value": 171965.0}, {"source": 35, "target": 20, "value": 95200.0}, {"source": 36, "target": 16, "value": 4570.0}, {"source": 38, "target": 37, "value": 49385.0}], "multigraph": false}
+
+  sankey
+      .nodes(energy.nodes)
+      .links(energy.links)
+      .layout(32);
+
+  var link = svg.append("g").selectAll(".link")
+      .data(energy.links)
+    .enter().append("path")
+      .attr("class", "link")
+      .attr("d", path)
+      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+      .sort(function(a, b) { return b.dy - a.dy; });
+
+  link.append("title")
+      .text(function(d) { return d.source.name + " -> " + d.target.name + " " + format(d.value); });
+
+  var node = svg.append("g").selectAll(".node")
+      .data(energy.nodes)
+    .enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .call(d3.behavior.drag()
+      .origin(function(d) { return d; })
+      .on("dragstart", function() { this.parentNode.appendChild(this); })
+      .on("drag", dragmove));
+
+  node.append("rect")
+      .attr("height", function(d) { return d.dy; })
+      .attr("width", sankey.nodeWidth())
+      .style("fill", function(d) { return d.color = color(d.name.replace(/ .*/, "")); })
+      .style("stroke", function(d) { return d3.rgb(d.color).darker(2); })
+    .append("title")
+      .text(function(d) { return d.name + " " + format(d.value); });
+
+  node.append("text")
+      .attr("x", -6)
+      .attr("y", function(d) { return d.dy / 2; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", "end")
+      .attr("transform", null)
+      .text(function(d) { return d.name; })
+    .filter(function(d) { return d.x < width / 2; })
+      .attr("x", 6 + sankey.nodeWidth())
+      .attr("text-anchor", "start");
+
+  function dragmove(d) {
+    d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+    sankey.relayout();
+    link.attr("d", path);
+  }
+//});
+
+</script>
+
+{% endblock %}
