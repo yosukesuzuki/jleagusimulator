@@ -383,17 +383,17 @@ def check_trade_data(request):
 def set_test_data():
     from adminapp.test_data import TEST_DATA
     for d in TEST_DATA['list']['JPlayerData']:
-        key_name = d['old_team'].encode('utf-8')+d['title'].encode('utf-8')
+        key_name = d['old_team']+d['title']
         try:
-            trade_comment=d['trade_comment'].encode('utf-8')
+            trade_comment=d['trade_comment']
         except:
             trade_comment=''
         entity = JPlayerData(key_name=key_name,
                 display_page_flg=True,
                 year='2013-2014',
-                title=d['title'].encode('utf-8'),
-                new_team=d['new_team'].encode('utf-8'),
-                old_team=d['old_team'].encode('utf-8'),
+                title=d['title'],
+                new_team=d['new_team'],
+                old_team=d['old_team'],
                 trade_comment=trade_comment,
                 player_type=d['player_type'],
                 game_count=int(d['game_count']),
