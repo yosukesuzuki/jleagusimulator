@@ -132,6 +132,7 @@ view_groups = [
     Rule('/image/delete/<string:key>', endpoint='image_delete', view='adminapp.views.image_delete'),
     Rule('/insert/team/', endpoint='insert_team', view='adminapp.views.insert_team'),
     Rule('/check/trade/data/', endpoint='check_trade_data', view='adminapp.views.check_trade_data'),
+    Rule('/test/data/', endpoint='test_data', view='adminapp.views.test_data'),
   ),
   AdminPageCRUDViewGroup(),
   ArticleCRUDViewGroup(),

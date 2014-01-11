@@ -379,3 +379,41 @@ def check_trade_data(request):
     #    url = base_url + r.team_id
     #    parse_trade_info(url)
     return Response('ok')
+
+def set_test_data():
+    from adminapp.test_data import TEST_DATA
+    for d in TEST_DATA['list']['JPlayerData']:
+        key_name = d['old_team'].encode('utf-8')+d['title'].encode('utf-8')
+        try:
+            trade_comment=d['trade_comment'].encode('utf-8')
+        except:
+            trade_comment=''
+        entity = JPlayerData(key_name=key_name,
+                display_page_flg=True,
+                year='2013-2014',
+                title=d['title'].encode('utf-8'),
+                new_team=d['new_team'].encode('utf-8'),
+                old_team=d['old_team'].encode('utf-8'),
+                trade_comment=trade_comment,
+                player_type=d['player_type'],
+                game_count=int(d['game_count']),
+                goal_get=int(d['goal_get']),
+                assist=int(d['assist']),
+                shoot=int(d['shoot']),
+                passn=int(d['passn']),
+                dribble=int(d['dribble']),
+                tackle=int(d['tackle']),
+                clear=int(d['clear']),
+                intercept=int(d['intercept']),
+                goal_lost=int(d['goal_lost']),
+                save_count=int(d['save_count']),
+                save_ratio=float(d['save_ratio']),
+                catch=int(d['catch']),
+                feed_throw=float(d['feed_throw']),
+                feed_kick=float(d['feed_kick']))
+        entity.put()
+
+
+def test_data(request):
+    set_test_data()
+    return Response('ok')
