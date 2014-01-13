@@ -26,58 +26,120 @@
 }
 </style>
 
-<p id="chart">
+<p id="chart"></p>
 
 {% endblock %}
 {%block scripts%}
-<script src="http://d3js.org/d3.v2.min.js?2.9.1"></script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="/media/js/sankey.js"></script>
 <script>
+//parameters
+var new_season_id = 19;
+var gk_defence_ratio = 1.417;
+var finisher_ratio = 0.8;
+var from_high_school = 0.5;
+var from_univ = 0.8;
+var from_oversea = 2;
 
 var margin = {top: 1, right: 1, bottom: 6, left: 1},
-    width = 660 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = 900 - margin.left - margin.right,
+    height = 900 - margin.top - margin.bottom;
 
 var formatNumber = d3.format(",.0f"),
     format = function(d) { return formatNumber(d); },
     color = d3.scale.category20();
 
-var svg = d3.select("#chart").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+True=true;
+False=false;
+trades={"directed": true, "graph": [], 
+    "nodes": [{"name": "広島source", "id": 0},{"name": "広島target", "id": 1}], 
+    "links": [{"source": 0, "target": 1, "value": 15.111111}], "multigraph": false};
 
-var sankey = d3.sankey()
-    .nodeWidth(15)
-    .nodePadding(10)
-    .size([width, height]);
+$(document).ready(function() {
+    var nodes = [];
+    var links = [];
+    $.getJSON('{{url_for('vapp/trade_data')}}', function (result) {
+        var nodes_dic = {};
+        $.each(result.nodes,function(i,val){
+            if(typeof val.base_value !== 'undefined'){
+                nodes_dic[val.name] = {'base_value':val.base_value,'id':val.id};
+            }
+            nodes.push(val);
+        });
+        //console.log(nodes_dic);
+        $.each(result.links,function(i,val){
+            if(val.player_type == 'GK'){
+                val.value = (((val.goal_lost / val.game_count) - gk_defence_ratio)*val.game_count)*val.save_ratio*-0.01;
+                links.push(val);
+            }else{
+                //todo j2選手の処理
+                val.value = (val.goal_get * finisher_ratio) + val.assist * ( 1 - finisher_ratio);
+                if(val.j_class == '高卒新人'){
+                    val.value = from_high_school;
+                }else if(val.j_class == '大卒新人'){
+                    val.value = from_univ;
+                }else if(val.j_class == '外国籍選手'){
+                    val.value = from_oversea;
+                }
+                links.push(val);
+            }
+            if(typeof nodes_dic[val.old_team] !== 'undefined'){
+                    nodes_dic[val.old_team].base_value = nodes_dic[val.old_team].base_value - val.value;
+            }
+        });
+        //console.log(links);
+        //console.log(nodes_dic);
+        $.each(nodes_dic,function(i,val){
+            //console.log(val);
+            links.push({'source':val.id,'name':'残留','target':val.id+new_season_id,'value':val.base_value})
+        });
+        //console.log(links);
+        nodes.sort(function(a,b){
+		var a_id = a["id"];
+		var b_id = b["id"];
+		if( a_id < b_id ) return -1;
+		if( a_id > b_id ) return 1;
+		return 0;
+        });
+        trades.nodes = nodes;
+        trades.links = links;
+        console.log(trades);
+        drawChart();
+    });
+});
+//drawChart();
 
-var path = sankey.link();
+function drawChart(){ 
+    var svg = d3.select("#chart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-//d3.json("../ergast_championship_nodelist/", function(energy) {
-True=true
-False=false
-energy={"directed": true, "graph": [], "nodes": [{"name": "Open University ", "id": 0}, {"name": "Shropshire Council", "id": 1}, {"name": "OPEN UNIVERSITY ", "id": 2}, {"name": "Leeds City Council", "id": 3}, {"name": "Manchester City Council", "id": 4}, {"name": "City of Westminster", "id": 5}, {"name": "Worcestershire County Council", "id": 6}, {"name": "London Borough of Hillingdon", "id": 7}, {"name": "Norfolk County Council", "id": 8}, {"name": "Barnsley Borough Council", "id": 9}, {"name": "Newcastle upon Tyne City Council", "id": 10}, {"name": "Derbyshire County Council", "id": 11}, {"name": "OPEN UNIVERSITY FINANCE DIVISION ", "id": 12}, {"name": "Nottinghamshire County Council", "id": 13}, {"name": "OPEN UNIVERSITY, FINANCE DIVISION ", "id": 14}, {"name": "Bristol City Council", "id": 15}, {"name": "THE OPEN UNIVERSITY ", "id": 16}, {"name": "Coventry City Council", "id": 17}, {"name": "London Borough of Brent", "id": 18}, {"name": "Kent County Council", "id": 19}, {"name": "The Open University ", "id": 20}, {"name": "Trafford Council", "id": 21}, {"name": "Warrington Council", "id": 22}, {"name": "Somerset County Council", "id": 23}, {"name": "Spelthorne Borough Council", "id": 24}, {"name": "Royal Borough of Windsor and Maidenhead", "id": 25}, {"name": "London Borough of Bromley", "id": 26}, {"name": "Surrey County Council", "id": 27}, {"name": "Cornwall Council", "id": 28}, {"name": "Lancashire County Council", "id": 29}, {"name": "Brighton and Hove City Council", "id": 30}, {"name": "Cambridgeshire County Council", "id": 31}, {"name": "London Borough of Redbridge", "id": 32}, {"name": "Hull City Council", "id": 33}, {"name": "Hampshire County Council", "id": 34}, {"name": "Heritage Lottery Fund", "id": 35}, {"name": "Cambridge City Council", "id": 36}, {"name": "THE OPEN UNIVERSITY FINANCE DIVISIO ", "id": 37}, {"name": "Buckinghamshire County Council", "id": 38}], "links": [{"source": 1, "target": 0, "value": 5200.0}, {"source": 3, "target": 2, "value": 5850.0}, {"source": 4, "target": 0, "value": 8440.0}, {"source": 5, "target": 2, "value": 12105.0}, {"source": 6, "target": 16, "value": 12750.0}, {"source": 6, "target": 2, "value": 19080.0}, {"source": 7, "target": 2, "value": 13400.0}, {"source": 8, "target": 0, "value": 23375.0}, {"source": 9, "target": 2, "value": 54750.0}, {"source": 10, "target": 2, "value": 9040.0}, {"source": 11, "target": 0, "value": 77530.0}, {"source": 13, "target": 12, "value": 49610.0}, {"source": 15, "target": 14, "value": 7228.0}, {"source": 17, "target": 16, "value": 5545.0}, {"source": 18, "target": 16, "value": 3540.0}, {"source": 19, "target": 16, "value": 3965.0}, {"source": 21, "target": 20, "value": 6458.0}, {"source": 22, "target": 20, "value": 15550.0}, {"source": 23, "target": 16, "value": 42070.0}, {"source": 24, "target": 16, "value": 3555.0}, {"source": 25, "target": 20, "value": 6558.0}, {"source": 26, "target": 16, "value": 9930.0}, {"source": 27, "target": 20, "value": 3685.0}, {"source": 28, "target": 16, "value": 13380.0}, {"source": 29, "target": 16, "value": 7873.0}, {"source": 30, "target": 20, "value": 16800.0}, {"source": 31, "target": 20, "value": 40990.0}, {"source": 32, "target": 16, "value": 5980.0}, {"source": 33, "target": 16, "value": 4095.0}, {"source": 34, "target": 16, "value": 171965.0}, {"source": 35, "target": 20, "value": 95200.0}, {"source": 36, "target": 16, "value": 4570.0}, {"source": 38, "target": 37, "value": 49385.0}], "multigraph": false}
+    var sankey = d3.sankey()
+        .nodeWidth(15)
+        .nodePadding(10)
+        .size([width, height]);
+    var path = sankey.link();
 
-  sankey
-      .nodes(energy.nodes)
-      .links(energy.links)
+    sankey
+      .nodes(trades.nodes)
+      .links(trades.links)
       .layout(32);
 
-  var link = svg.append("g").selectAll(".link")
-      .data(energy.links)
+    var link = svg.append("g").selectAll(".link")
+      .data(trades.links)
     .enter().append("path")
       .attr("class", "link")
       .attr("d", path)
       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
       .sort(function(a, b) { return b.dy - a.dy; });
 
-  link.append("title")
+    link.append("title")
       .text(function(d) { return d.source.name + " -> " + d.target.name + " " + format(d.value); });
 
-  var node = svg.append("g").selectAll(".node")
-      .data(energy.nodes)
+    var node = svg.append("g").selectAll(".node")
+      .data(trades.nodes)
     .enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
@@ -86,7 +148,7 @@ energy={"directed": true, "graph": [], "nodes": [{"name": "Open University ", "i
       .on("dragstart", function() { this.parentNode.appendChild(this); })
       .on("drag", dragmove));
 
-  node.append("rect")
+    node.append("rect")
       .attr("height", function(d) { return d.dy; })
       .attr("width", sankey.nodeWidth())
       .style("fill", function(d) { return d.color = color(d.name.replace(/ .*/, "")); })
@@ -94,7 +156,7 @@ energy={"directed": true, "graph": [], "nodes": [{"name": "Open University ", "i
     .append("title")
       .text(function(d) { return d.name + " " + format(d.value); });
 
-  node.append("text")
+    node.append("text")
       .attr("x", -6)
       .attr("y", function(d) { return d.dy / 2; })
       .attr("dy", ".35em")
@@ -104,14 +166,13 @@ energy={"directed": true, "graph": [], "nodes": [{"name": "Open University ", "i
     .filter(function(d) { return d.x < width / 2; })
       .attr("x", 6 + sankey.nodeWidth())
       .attr("text-anchor", "start");
+}
 
-  function dragmove(d) {
-    d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
-    sankey.relayout();
-    link.attr("d", path);
-  }
-//});
-
+function dragmove(d) {
+d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+sankey.relayout();
+link.attr("d", path);
+}
 </script>
 
 {% endblock %}
