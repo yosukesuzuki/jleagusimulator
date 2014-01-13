@@ -214,7 +214,7 @@ def get_article_list(browser_lang,page,article_per_page,tag_name=False):
             'snippet':snippet,
             'url':url,
             'first_image':first_image,
-            'display_time':str(r.display_time)[:16]})
+            'display_time':str(r.display_time)[:10]})
     results_dic = {'articles':return_list,
     'current_page':results.number,
     'previous_page':results.previous_page_number,

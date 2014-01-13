@@ -24,7 +24,7 @@ TEMPLATE_DIRS = (
 )
 
 USE_I18N = True
-DEFAULT_LANG = 'en'
+DEFAULT_LANG = 'ja'
 
 MIDDLEWARE_CLASSES = (
         'kay.auth.middleware.AuthenticationMiddleware',
@@ -60,4 +60,6 @@ JINJA2_FILTERS = {
     'toMarkdown':'mainapp.template_filters.toMarkdown',
     'enforceMinus9hours':'mainapp.template_filters.enforceMinus9hours',
     'returnMessage':'mainapp.template_filters.returnMessage',
+    'firstTitle':'mainapp.template_filters.firstTitle',
+    'secondTitle':'mainapp.template_filters.secondTitle',
 }

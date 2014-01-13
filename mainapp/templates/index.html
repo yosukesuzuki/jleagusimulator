@@ -2,11 +2,27 @@
 {% block title %}{% endblock %}
 {% block description %}{{results[0]['snippet']}}{% endblock %}
 {% block content %}
-<div class="row">
-    <ul>
-        <li><a href="{{url_for('vapp/index')}}">Jリーグ移籍市場ヴィジュアル化</a></li>  
-    </ul>
+{% for article in article_results['articles'] %}
+<div class="row featurette">
+    <div class="col-md-7">
+        <a href="{{article['url']}}">
+        <h2 class="featurette-heading">{{article['title']|firstTitle}}
+            <span class="text-muted">{{article['title']|secondTitle}}</span>
+        </h2>
+        </a>
+        <time>{{article['display_time']}}</time>
+        <p class="lead">{{article['snippet']}}</p>
+    </div>
+    {% if article['first_image'] %} 
+    <div class="col-md-5">
+        <a href="{{article['url']}}">
+            <img class="featurette-image img-responsive" src="{{article['first_image']}}=s500-c" height=500 width=500>
+        </a>
+    </div>
+    {% endif %}
 </div>
+<hr class="featurette-divider">
+{% endfor %}
 {% endblock %}
 {%block scripts%}
 {% endblock %}

@@ -17,6 +17,18 @@ def enforceMinus9hours(datetime_string):
     return_datetime_string = display_time.strftime('%Y-%m-%d %H:%M')
     return return_datetime_string
 
+def firstTitle(title):
+    title_arr = title.split(' ')
+    return title_arr[0]
+
+def secondTitle(title):
+    title_arr = title.split(' ')
+    if len(title) > 1:
+        second_title = u''.join(title_arr[1:])
+        return second_title
+    else:
+        return ''
+
 MESSAGES = {'default':_('Invalid Parameter'),
         'loginfail001':_('Login Failed'),
         'loginsuccess001':_('Login Success'),
