@@ -61,10 +61,10 @@ def get_node_data():
     nodes = []
     for rr in rank_results:
         nodes.append({'name':rr.team.key().name(),'id':rr.rank - 1,'point':rr.point,'goal_get':rr.goal_get,
-            'goal_lost':rr.goal_lost,'goal_point':rr.goal_point,'base_value':rr.goal_point+GOAL_POINT_BASE})
-        nodes.append({'name':rr.team.key().name(),'id':rr.rank - 1 + 19})
-    nodes.append({'name':u'その他','id':18})
-    nodes.append({'name':u'その他','id':18+19})
+            'goal_lost':rr.goal_lost,'goal_point':rr.goal_point,'base_value':rr.goal_point+GOAL_POINT_BASE,'color':rr.team.color})
+        nodes.append({'name':rr.team.key().name(),'id':rr.rank - 1 + 19,'color':rr.team.color})
+    nodes.append({'name':u'その他','id':18,'color':'#666666'})
+    nodes.append({'name':u'その他','id':18+19,'color':'#666666'})
     return nodes
 
 def get_trade_player_data():

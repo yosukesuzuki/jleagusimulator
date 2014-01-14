@@ -14,9 +14,9 @@ nagoya;名古屋グランパス;名古屋;J1;#D80C18
 tosu;サガン鳥栖;鳥栖;J1;#10A5D1
 urawa;浦和レッズ;浦和;J1;#E6002D
 ftokyo;FC東京;F東京;J1;#21409A
-shonan;湘南ベルマーレ;湘南;J1;#005CA2
+shonan;湘南ベルマーレ;湘南;J1;#78BD2C
 shimizu;清水エスパルス;清水;J1;#FF9809
-cosaka;セレッソ大阪;C大阪;J1;#110070
+cosaka;セレッソ大阪;C大阪;J1;#F21E8C
 oita;大分トリニータ;大分;J1;#140A8C
 sapporo;コンサドーレ札幌;札幌;J2;#D6000F
 tochigi;栃木SC;栃木;J2;#005BAC
