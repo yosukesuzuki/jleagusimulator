@@ -274,7 +274,8 @@ def insert_team_data():
                 team_name=cells[1],
                 team_short_name=cells[2],
                 team_id=cells[0],
-                j_class=cells[3])
+                j_class=cells[3],
+                color=cells[4])
         entity.put()
 
 def insert_rank_data():

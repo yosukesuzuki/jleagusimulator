@@ -44,6 +44,7 @@ var finisher_ratio = 0.8;
 var from_high_school = 0.5;
 var from_univ = 0.8;
 var from_oversea = 2;
+var j2_player = 0.33;
 
 var margin = {top: 1, right: 1, bottom: 6, left: 1},
     width = 900 - margin.left - margin.right,
@@ -78,7 +79,9 @@ $(document).ready(function() {
             }else{
                 //todo j2選手の処理
                 val.value = (val.goal_get * finisher_ratio) + val.assist * ( 1 - finisher_ratio);
-                if(val.j_class == '高卒新人'){
+                if(val.j_class == 'J2'){
+                    val.value = val.value * j2_player;
+                }else if(val.j_class == '高卒新人'){
                     val.value = from_high_school;
                 }else if(val.j_class == '大卒新人'){
                     val.value = from_univ;
@@ -107,7 +110,7 @@ $(document).ready(function() {
         });
         trades.nodes = nodes;
         trades.links = links;
-        console.log(trades);
+        //console.log(trades);
         drawChart();
     });
 });
@@ -146,11 +149,11 @@ function drawChart(){
       .data(trades.nodes)
     .enter().append("g")
       .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-    .call(d3.behavior.drag()
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+/*    .call(d3.behavior.drag()
       .origin(function(d) { return d; })
       .on("dragstart", function() { this.parentNode.appendChild(this); })
-      .on("drag", dragmove));
+      .on("drag", dragmove));*/
 
     node.append("rect")
       .attr("height", function(d) { return d.dy; })

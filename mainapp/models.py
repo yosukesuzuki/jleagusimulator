@@ -61,6 +61,7 @@ class JLeagueTeam(db.Model):
     team_short_name = db.StringProperty(verbose_name=_('Team Short Name'),default='',indexed=False)
     team_id = db.StringProperty(verbose_name=_('Team ID'),default='',indexed=False)
     j_class = db.StringProperty(verbose_name=_('J Class'),choices=('J1','J2'))
+    color = db.StringProperty(verbose_name=_('Color Code'))
     update = db.DateTimeProperty(verbose_name=_('Update'),auto_now=True)
     created = db.DateTimeProperty(verbose_name=_('Created'),auto_now_add=True)
 
