@@ -28,7 +28,7 @@
 <h1 class="featurette-heading">Jリーグ移籍市場をd3.jsでビジュアル化
     <span class="text-muted">2013-2014シーズン</span>
 </h1>
-<div class="row" style="height:950px">
+<div class="row" style="height:1200px">
     <p id="chart"></p>
 </div>
 
@@ -47,8 +47,8 @@ var from_oversea = 2;
 var j2_player = 0.33;
 
 var margin = {top: 1, right: 1, bottom: 6, left: 1},
-    width = 900 - margin.left - margin.right,
-    height = 900 - margin.top - margin.bottom;
+    width = 650 - margin.left - margin.right,
+    height = 1100 - margin.top - margin.bottom;
 
 var formatNumber = d3.format(",.0f"),
     format = function(d) { return formatNumber(d); },
@@ -143,7 +143,7 @@ function drawChart(){
       .sort(function(a, b) { return b.dy - a.dy; });
 
     link.append("title")
-      .text(function(d) { return d.source.name + " -> " + d.target.name + " " + format(d.value); });
+      .text(function(d) { return d.name +'('+d.source.name + " -> " + d.target.name + ")" + format(d.value); });
 
     var node = svg.append("g").selectAll(".node")
       .data(trades.nodes)
