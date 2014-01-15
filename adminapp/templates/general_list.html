@@ -23,7 +23,7 @@
         </thead>
         <tbody>
     {% for entity in entities %}
-    <tr id="{{entity.key()}}" {% if entity.display_page_flg == False %}class="warning"{% endif %}>
+    <tr id="{{entity.key()}}" {% if entity.display_page_flg == False %}class="active"{% endif %}>
             <td class="col-md-5" onClick="window.location.href='{{ update_url(entity) }}'">
                 <a href="{{ update_url(entity) }}">{{ entity.title }}</a>
 
