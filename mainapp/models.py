@@ -81,6 +81,9 @@ class JLeagueRank(db.Model):
     created = db.DateTimeProperty(verbose_name=_('Created'),auto_now_add=True)
 
 class JPlayerData(db.Model):
+    '''
+    J League Player Trade Information
+    '''
     display_page_flg = db.BooleanProperty(verbose_name=_('Display this page'),default=False)
     year = db.StringProperty(verbose_name=_('Year,Seson'),default='')
     player_type = db.StringProperty(verbose_name=_('Player Type'),choices=('Field','GK'),default='Field')

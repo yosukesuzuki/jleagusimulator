@@ -63,7 +63,8 @@ from adminapp.utils import construct_datetime_from_string,construct_image_json_f
 def index(request):
     admin_page_list = [{'title':_('Page Manager'),'info':AdminPage.__doc__,'url':'/admin/adminpage/list'},
             {'title':_('Article Manager'),'info':Article.__doc__,'url':'/admin/article/list'},
-            {'title':_('Image Manager'),'info':BlobStoreImage.__doc__,'url':'/admin/image/manager/'}]
+            {'title':_('Image Manager'),'info':BlobStoreImage.__doc__,'url':'/admin/image/manager/'},
+            {'title':_('Player Data Manager'),'info':JPlayerData.__doc__,'url':'/admin/jplayerdata/list'}]
     return render_to_response('adminapp/index.html', {'admin_page_list': admin_page_list})
 
 def flush_memcache(request):
