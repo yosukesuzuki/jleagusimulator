@@ -75,16 +75,19 @@ $(document).ready(function() {
         $.each(result.links,function(i,val){
             if(val.player_type == 'GK'){
                 val.value = (((val.goal_lost / val.game_count) - gk_defence_ratio)*val.game_count)*val.save_ratio*-0.01;
+                if(val.j_class == 'J2'){
+                    val.value = val.value * j2_player;
+                }
                 links.push(val);
             }else{
                 //todo j2選手の処理
                 val.value = (val.goal_get * finisher_ratio) + val.assist * ( 1 - finisher_ratio);
                 if(val.j_class == 'J2'){
                     val.value = val.value * j2_player;
-                }else if(val.j_class == '高卒新人'){
-                    val.value = from_high_school;
-                }else if(val.j_class == '大卒新人'){
-                    val.value = from_univ;
+                //}else if(val.j_class == '高卒新人'){
+                //    val.value = from_high_school;
+                //}else if(val.j_class == '大卒新人'){
+                //    val.value = from_univ;
                 }else if(val.j_class == '外国籍選手'){
                     val.value = from_oversea;
                 }
