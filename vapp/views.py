@@ -47,6 +47,7 @@ from settings import DEFAULT_LANG
 
 from mainapp.markdown2 import markdown
 from mainapp.models import AdminPage,BlobStoreImage,Article,JLeagueRank,JLeagueTeam,JPlayerData
+from mainapp.views import get_page_content
 
 TARGET2014 = 18
 GK_DEFENCE_RATE = 1.417
@@ -54,7 +55,19 @@ GOAL_POINT_BASE = 70
 # Create your views here.
 
 def index(request):
-    return render_to_response('vapp/index.html', {'message': 'Hello'})
+    key_name = 'jfoottrade2013-2014'
+    browser_lang = request.lang
+    try:
+        prior_lang = request.args['hl']
+    except:
+        prior_lang = None
+    if prior_lang and browser_lang != prior_lang:
+        browser_lang = prior_lang
+    model_name = 'Article'
+    page = get_page_content(browser_lang,model_name,key_name)
+    if page is None:
+        return render_to_response('mainapp/404.html', {})
+    return render_to_response('vapp/index.html', {'page': page})
 
 def get_node_data():
     rank_results = JLeagueRank.all().order('rank').fetch(1000)
@@ -81,7 +94,7 @@ def get_trade_player_data():
             new_team = JLeagueTeam.get_by_key_name(op.new_team)
             if new_team is None or new_team.j_class != 'J1':
                 new_team_target = 37 
-                new_team_name = u'その他'
+                new_team_name = op.new_team 
             else:
                 logging.info(new_team.team_id)
                 new_team_target_entity = JLeagueRank.get_by_key_name(new_team.team_id+'2013')

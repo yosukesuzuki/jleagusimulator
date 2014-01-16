@@ -1,6 +1,6 @@
 {% extends "mainapp/base.html"%}
 {% block title %}Jリーグ移籍市場をd3.jsでビジュアル化 2013-2014シーズン:{% endblock %}
-{% block description %}{% endblock %}
+{% block description %}{{page.snippet}}{% endblock %}
 {% block content %}
 
 <style>
@@ -25,11 +25,20 @@
   stroke-opacity: .5;
 }
 </style>
-<h1 class="featurette-heading">Jリーグ移籍市場をd3.jsでビジュアル化
-    <span class="text-muted">2013-2014シーズン</span>
+<h1 class="featurette-heading">{{page.title|firstTitle}}
+    <span class="text-muted">{{page.title|secondTitle}}</span>
 </h1>
-<div class="row" style="height:1200px">
-    <p id="chart"></p>
+<div class="row">
+    <div class="col-md-8" style="height:1200px">
+        <p id="chart"></p>
+    </div>
+    <div class="col-md-4" id="trade-info">
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-9 page-body">
+        {{page.content|safe}}
+    </div>
 </div>
 
 {% endblock %}
@@ -47,7 +56,7 @@ var from_oversea = 2;
 var j2_player = 0.33;
 
 var margin = {top: 1, right: 1, bottom: 6, left: 1},
-    width = 650 - margin.left - margin.right,
+    width = 630 - margin.left - margin.right,
     height = 1100 - margin.top - margin.bottom;
 
 var formatNumber = d3.format(",.0f"),
