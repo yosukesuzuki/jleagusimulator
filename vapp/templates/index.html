@@ -28,7 +28,24 @@
     <span class="text-muted">{{page.title|secondTitle}}</span>
 </h1>
 <div class="row">
-    <div class="col-md-8" style="height:1200px">
+    <form class="form-inline" role="form">
+        <div class="form-group col-md-2">
+            <label for="finisher_ratio" class="control-label">得点者比率(%)</label>
+            <input type="number" class="form-control" id="finisher_ratio" placeholder="%" value="80">
+        </div>
+        <div class="form-group col-md-2">
+            <label for="j2_player" class="control-label">J2期待値(%)</label>
+            <input type="number" class="form-control" id="j2_player" placeholder="%" value="33">
+        </div>
+        <div class="form-group col-md-2">
+            <label for="from_oversea" class="control-label">海外→加入期待値</label>
+            <input type="number" class="form-control" id="from_oversea" placeholder="" value="2">
+        </div>
+        <span class="btn btn-default" id="redraw">再描画</span>
+    </form>
+</div>
+<div class="row">
+    <div class="col-md-8" style="height:1200px" id="chart-container">
         <p id="chart"></p>
     </div>
     <div class="col-md-4" id="trade-detail">
@@ -45,7 +62,7 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script src="/media/js/sankey.js"></script>
 <script>
-//parameters
+//parameters init
 var new_season_id = 19;
 var gk_defence_ratio = 1.417;
 var finisher_ratio = 0.8;
@@ -65,67 +82,94 @@ var formatNumber = d3.format(",.0f"),
 True=true;
 False=false;
 trades={"directed": true, "graph": [], 
-    "nodes": [{"name": "広島source", "id": 0},{"name": "広島target", "id": 1}], 
-    "links": [{"source": 0, "target": 1, "value": 15.111111}], "multigraph": false};
+    "nodes": [], 
+    "links": [],
+    "data":{},"multigraph": false};
 
 $(document).ready(function() {
-    var nodes = [];
-    var links = [];
+    var hashVars = window.location.hash.replace(/#/g,'').split('&');
+    //console.log(hashVars);
+    $.each(hashVars,function(i,val){
+        var hashKeyAndValue = val.split('=');
+        if(hashKeyAndValue[0] === 'finisher_ratio'){
+            $('#finisher_ratio').val(hashKeyAndValue[1]);
+        }
+        if(hashKeyAndValue[0] === 'j2_player'){
+            $('#j2_player').val(hashKeyAndValue[1]);
+        }
+        if(hashKeyAndValue[0] === 'from_oversea'){
+            $('#from_oversea').val(hashKeyAndValue[1]);
+        }
+    });
+    
     $.getJSON('{{url_for('vapp/trade_data')}}', function (result) {
-        var nodes_dic = {};
-        $.each(result.nodes,function(i,val){
-            if(typeof val.base_value !== 'undefined'){
-                nodes_dic[val.name] = {'base_value':val.base_value,'id':val.id};
-            }
-            nodes.push(val);
-        });
-        //console.log(nodes_dic);
-        $.each(result.links,function(i,val){
-            if(val.player_type == 'GK'){
-                val.value = (((val.goal_lost / val.game_count) - gk_defence_ratio)*val.game_count)*val.save_ratio*-0.01;
-                if(val.j_class == 'J2'){
-                    val.value = val.value * j2_player;
-                }
-                links.push(val);
-            }else{
-                //todo j2選手の処理
-                val.value = (val.goal_get * finisher_ratio) + val.assist * ( 1 - finisher_ratio);
-                if(val.j_class == 'J2'){
-                    val.value = val.value * j2_player;
-                //}else if(val.j_class == '高卒新人'){
-                //    val.value = from_high_school;
-                //}else if(val.j_class == '大卒新人'){
-                //    val.value = from_univ;
-                }else if(val.j_class == '外国籍選手'){
-                    val.value = from_oversea;
-                }
-                links.push(val);
-            }
-            if(typeof nodes_dic[val.old_team] !== 'undefined'){
-                    nodes_dic[val.old_team].base_value = nodes_dic[val.old_team].base_value - val.value;
-            }
-        });
-        //console.log(links);
-        //console.log(nodes_dic);
-        $.each(nodes_dic,function(i,val){
-            //console.log(val);
-            links.push({'source':val.id,'name':'残留','target':val.id+new_season_id,'value':val.base_value})
-        });
-        //console.log(links);
-        nodes.sort(function(a,b){
-		var a_id = a["id"];
-		var b_id = b["id"];
-		if( a_id < b_id ) return -1;
-		if( a_id > b_id ) return 1;
-		return 0;
-        });
-        trades.nodes = nodes;
-        trades.links = links;
-        //console.log(trades);
+        trades.data = result;
+        setChartData();
         drawChart();
     });
 });
 //drawChart();
+
+function setChartData(){
+    var nodes = [];
+    var links = [];
+    var nodes_dic = {};
+    var result = trades.data;
+    var finisher_ratio = parseInt($("#finisher_ratio").val()) / 100;
+    var j2_player = parseInt($("#j2_player").val()) / 100;
+    var from_oversea = parseInt($("#from_oversea").val()); 
+    $.each(result.nodes,function(i,val){
+        if(typeof val.base_value !== 'undefined'){
+            nodes_dic[val.name] = {'base_value':val.base_value,'id':val.id};
+        }
+        nodes.push(val);
+    });
+    //console.log(nodes_dic);
+    $.each(result.links,function(i,val){
+        if(val.player_type == 'GK'){
+            val.value = (((val.goal_lost / val.game_count) - gk_defence_ratio)*val.game_count)*val.save_ratio*-0.01;
+            if(val.j_class == 'J2'){
+                val.value = val.value * j2_player;
+            }
+            links.push(val);
+        }else{
+            //todo j2選手の処理
+            val.value = (val.goal_get * finisher_ratio) + val.assist * ( 1 - finisher_ratio);
+            if(val.j_class == 'J2'){
+                val.value = val.value * j2_player;
+            //}else if(val.j_class == '高卒新人'){
+            //    val.value = from_high_school;
+            //}else if(val.j_class == '大卒新人'){
+            //    val.value = from_univ;
+            }else if(val.j_class == '外国籍選手'){
+                val.value = from_oversea;
+            }
+            links.push(val);
+        }
+        if(typeof nodes_dic[val.old_team] !== 'undefined'){
+                nodes_dic[val.old_team].base_value = nodes_dic[val.old_team].base_value - val.value;
+        }
+    });
+    //console.log(links);
+    //console.log(nodes_dic);
+    $.each(nodes_dic,function(i,val){
+        //console.log(val);
+        links.push({'source':val.id,'name':'残留','target':val.id+new_season_id,'value':val.base_value})
+    });
+    //console.log(links);
+    nodes.sort(function(a,b){
+            var a_id = a["id"];
+            var b_id = b["id"];
+            if( a_id < b_id ) return -1;
+            if( a_id > b_id ) return 1;
+            return 0;
+    });
+    trades.nodes = nodes;
+    trades.links = links;
+    //console.log(trades);
+    //drawChart();
+    window.location.hash = "finisher_ratio="+format(finisher_ratio*100)+'&j2_player='+format(j2_player*100)+'&from_oversea='+from_oversea;
+}
 
 function drawChart(){ 
     var svg = d3.select("#chart").append("svg")
@@ -216,6 +260,13 @@ function showTeamDetail(d){
     //console.log(in_players);
     $('#trade-detail').html('<table class="table table-condensed"><caption>'+d.name+'</caption>'+out_players+in_players+'</table>');
 }
+$('#redraw').on('click',function(){
+    $('#chart').remove();
+    $('#chart-container').html('<p id="chart"></p>');
+    $('#trade-detail').html('');
+    setChartData();
+    drawChart();
+});
 </script>
 
 {% endblock %}
