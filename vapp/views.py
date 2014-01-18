@@ -109,7 +109,7 @@ def get_trade_player_data():
             #旧チームがJ1の場合は重複排除でスキップ
             if old_team and old_team.j_class == 'J1':
                 continue
-            old_team_name = u'その他'
+            #old_team_name = u'その他'
             source = 18
             #旧チームがJではない場合
             if old_team is None:
@@ -117,7 +117,7 @@ def get_trade_player_data():
             #旧チームがJ2のとき
             elif old_team.j_class == 'J2':
                 j_class = 'J2'
-            out_players.append({'name':op.title,'source':source,'target':rr.rank + - 1 + 19,'old_team':old_team_name,'new_team':rr.team.key().name(),
+            out_players.append({'name':op.title,'source':source,'target':rr.rank + - 1 + 19,'old_team':op.old_team,'new_team':rr.team.key().name(),
                 'player_type':op.player_type,'game_count':op.game_count,'goal_get':op.goal_get,'assist':op.assist,
                 'goal_lost':op.goal_lost,'save_ratio':op.save_ratio,'j_class':j_class})
     return out_players

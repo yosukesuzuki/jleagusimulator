@@ -1,8 +1,7 @@
 {% extends "mainapp/base.html"%}
-{% block title %}Jリーグ移籍市場をd3.jsでビジュアル化 2013-2014シーズン:{% endblock %}
+{% block title %}{{page.title}}:{% endblock %}
 {% block description %}{{page.snippet}}{% endblock %}
 {% block content %}
-
 <style>
 #chart {
   height: 500px;
@@ -32,7 +31,7 @@
     <div class="col-md-8" style="height:1200px">
         <p id="chart"></p>
     </div>
-    <div class="col-md-4" id="trade-info">
+    <div class="col-md-4" id="trade-detail">
     </div>
 </div>
 <div class="row">
@@ -161,7 +160,9 @@ function drawChart(){
       .data(trades.nodes)
     .enter().append("g")
       .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+      .attr("data-team-name", function(d){return d.name })
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+      .on("click",showTeamDetail);
 /*    .call(d3.behavior.drag()
       .origin(function(d) { return d; })
       .on("dragstart", function() { this.parentNode.appendChild(this); })
@@ -198,6 +199,22 @@ function dragmove(d) {
 d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
 sankey.relayout();
 link.attr("d", path);
+}
+function showTeamDetail(d){
+    //console.log(d.name);
+    var out_players = '';
+    var in_players = '';
+    $.each(trades.links,function(i,val){
+        if(val.old_team == d.name){
+            out_players += '<tr class="warning"><td>'+val.name+'</td><td>→ '+val.new_team+'</td></tr>'; 
+        }
+        if(val.new_team == d.name){
+            in_players += '<tr class="active"><td>'+val.old_team+' →</td><td>'+val.name+'</td></tr>'; 
+        }
+    });
+    //console.log(out_players);
+    //console.log(in_players);
+    $('#trade-detail').html('<table class="table table-condensed"><caption>'+d.name+'</caption>'+out_players+in_players+'</table>');
 }
 </script>
 
