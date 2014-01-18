@@ -206,10 +206,10 @@ function showTeamDetail(d){
     var in_players = '';
     $.each(trades.links,function(i,val){
         if(val.old_team == d.name){
-            out_players += '<tr class="warning"><td>'+val.name+'</td><td>→ '+val.new_team+'</td></tr>'; 
+            out_players += '<tr class="warning"><td>'+val.name+'('+format(val.value)+')</td><td>→ '+val.new_team+'</td></tr>'; 
         }
         if(val.new_team == d.name){
-            in_players += '<tr class="active"><td>'+val.old_team+' →</td><td>'+val.name+'</td></tr>'; 
+            in_players += '<tr class="active"><td>'+val.old_team+' →</td><td>'+val.name+'('+format(val.value)+')</td></tr>'; 
         }
     });
     //console.log(out_players);
