@@ -84,7 +84,7 @@ def get_trade_player_data():
     rank_results = JLeagueRank.all().order('rank').fetch(1000)
     out_players = []
     for rr in rank_results:
-        players = JPlayerData.all().filter(u'old_team =',rr.team.key().name()).fetch(1000)
+        players = JPlayerData.all().filter(u'display_page_flg =',True).filter(u'old_team =',rr.team.key().name()).fetch(1000)
         for op in players:
             if op.game_count < 1:
                 continue
@@ -103,7 +103,7 @@ def get_trade_player_data():
             out_players.append({'name':op.title,'source':rr.rank - 1,'target':new_team_target,'old_team':op.old_team,'new_team':new_team_name,
                 'player_type':op.player_type,'game_count':op.game_count,'goal_get':op.goal_get,'assist':op.assist,
                 'goal_lost':op.goal_lost,'save_ratio':op.save_ratio,'j_class':'J1'})
-        new_players = JPlayerData.all().filter(u'new_team =',rr.team.key().name()).fetch(1000)
+        new_players = JPlayerData.all().filter(u'display_page_flg =',True).filter(u'new_team =',rr.team.key().name()).fetch(1000)
         for op in new_players:
             old_team= JLeagueTeam.get_by_key_name(op.old_team)
             #旧チームがJ1の場合は重複排除でスキップ
