@@ -45,7 +45,7 @@
             <label for="from_oversea" class="control-label">海外→加入期待値</label>
             <input type="number" min="0" max="30" class="form-control" id="from_oversea" placeholder="" value="2">
         </div>
-        <span class="btn btn-info" id="redraw">再描画<span class="glyphicon glyphicon-refresh"></span></span>
+        <span class="btn btn-info disabled" id="redraw">再描画<span class="glyphicon glyphicon-refresh"></span></span>
         <span class="btn btn-default" id="set-default">デフォルトに戻す</span>
     </form>
 </div>
@@ -320,6 +320,9 @@ $('#set-default').on('click',function(){
     $('#from_oversea').val(2);
     setChartData();
     drawChart();
+});
+$(document).on('keyup mouseup','#finisher_ratio,#j2_player,#gk_ratio,#from_oversea',function(){
+    $('#redraw').removeClass('disabled');    
 });
 </script>
 
