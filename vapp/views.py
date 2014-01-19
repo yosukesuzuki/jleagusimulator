@@ -56,17 +56,21 @@ GOAL_POINT_BASE = 70
 
 def index(request):
     key_name = 'jfoottrade2013-2014'
-    browser_lang = request.lang
-    try:
-        prior_lang = request.args['hl']
-    except:
-        prior_lang = None
-    if prior_lang and browser_lang != prior_lang:
-        browser_lang = prior_lang
-    model_name = 'Article'
-    page = get_page_content(browser_lang,model_name,key_name)
+    page = memcache.get(key_name)
     if page is None:
-        return render_to_response('mainapp/404.html', {})
+        page = Article.get_by_key_name(key_name)
+        if page is None:
+            return render_to_response('mainapp/404.html', {})
+        markdown_converted_content = markdown(page.content)
+        snippet = html.strip_tags(markdown_converted_content).split('\n')[0]
+        page.content = markdown_converted_content
+        setattr(page,'snippet',snippet)
+        try:
+            first_image = json.loads(page.images)['images'][0]['image_path']
+        except:
+            first_image = None
+        setattr(page,'first_image',first_image)
+        memcache.set(key_name,page)
     return render_to_response('vapp/index.html', {'page': page})
 
 def get_node_data():
