@@ -127,7 +127,11 @@ def trade_data(request):
     data = memcache.get(memcache_key)
     if data:
         return Response(json.dumps(data))
-    data = {'nodes':get_node_data(),'links':get_trade_player_data()}
+    results = JPlayerData.all().order('-update').fetch(1)
+    update = None
+    for r in results:
+        update = r.update
+    data = {'nodes':get_node_data(),'links':get_trade_player_data(),'update':str(update)[:10]}
     memcache.set(memcache_key,data)
     return Response(json.dumps(data))
     

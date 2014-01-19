@@ -45,9 +45,12 @@
             <label for="from_oversea" class="control-label">海外→加入期待値</label>
             <input type="number" min="0" max="30" class="form-control" id="from_oversea" placeholder="" value="2">
         </div>
-        <span class="btn btn-info" id="redraw">再描画</span>
+        <span class="btn btn-info" id="redraw">再描画<span class="glyphicon glyphicon-refresh"></span></span>
         <span class="btn btn-default" id="set-default">デフォルトに戻す</span>
     </form>
+</div>
+<div class="row">
+    <span>データ更新日:</span><span id="update-date"></span>
 </div>
 <div class="row">
     <div class="col-md-8" style="height:1200px" id="chart-container">
@@ -88,7 +91,7 @@ False=false;
 trades={"directed": true, "graph": [], 
     "nodes": [], 
     "links": [],
-    "data":{},"multigraph": false};
+    "data":{},"multigraph": false,"update":""};
 
 $(document).ready(function() {
     var hashVars = window.location.hash.replace(/#/g,'').split('&');
@@ -130,20 +133,26 @@ function setChartData(){
     var links = [];
     var nodes_dic = {};
     var result = trades.data;
+    trades.update = result.update;
+    $('#update-date').text(trades.update);
     var finisher_ratio = parseInt($("#finisher_ratio").val()) / 100;
     if((finisher_ratio == NaN)||(finisher_ratio > 1.0)){
+        finisher_ratio = finisher_ratio_default / 100;
         $("#finisher_ratio").val(finisher_ratio_default);
     }
     var gk_ratio = parseInt($("#gk_ratio").val()) / 100;
     if((gk_ratio == NaN)||(gk_ratio > 1.0)){
+        gk_ratio = gk_ratio_default / 100;
         $("#gk_ratio").val(gk_ratio_default);
     }
     var j2_player = parseInt($("#j2_player").val()) / 100;
     if((j2_player == NaN)||(j2_player > 1.0)){
+        j2_player = j2_player_default / 100;
         $("#j2_player").val(j2_player_default);
     }
     var from_oversea = parseInt($("#from_oversea").val());
     if((from_oversea == NaN)||(from_oversea > 30)){
+        from_oversea = from_oversea_default;
         $("#from_oversea").val(from_oversea_default);
     }
     $.each(result.nodes,function(i,val){
