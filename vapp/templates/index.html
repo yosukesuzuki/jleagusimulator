@@ -23,7 +23,35 @@
 .link:hover {
   stroke-opacity: .5;
 }
+#showData {
+    position: absolute;
+    width:200px;
+    height:auto;
+    padding:10px;
+    background-color:white;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    -webkit-box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+    -moz-box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.4);
+    pointer-events:none;
+    z-index:1000;
+}
+#showData.hidden {
+    display:none;
+}
+#showData p {
+    margin:0;
+    font-family:sans-serif;
+    font-size:16px;
+    line-height:20px;
+
+}
 </style>
+<div id="showData" class="hidden">
+    <p><span id="showDataValue"></span></p>
+</div>
 <h1 class="featurette-heading">{{page.title|firstTitle}}
     <span class="text-muted">{{page.title|secondTitle}}</span>
 </h1>
@@ -45,7 +73,7 @@
             <label for="from_oversea" class="control-label">海外→加入期待値</label>
             <input type="number" min="0" max="30" class="form-control" id="from_oversea" placeholder="" value="2">
         </div>
-        <span class="btn btn-info disabled" id="redraw">再描画<span class="glyphicon glyphicon-refresh"></span></span>
+        <span class="btn btn-info disabled" id="redraw">チャートに反映<span class="glyphicon glyphicon-refresh"></span></span>
         <span class="btn btn-default" id="set-default">デフォルトに戻す</span>
     </form>
 </div>
@@ -237,7 +265,33 @@ function drawChart(){
       .attr("class", "link")
       .attr("d", path)
       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-      .sort(function(a, b) { return b.dy - a.dy; });
+      .sort(function(a, b) { return b.dy - a.dy; })
+      .on("mouseover",function(d){
+          var screen_size = {
+              width: window.innerWidth || document.body.clientWidth,
+              height: window.innerHeight || document.body.clientHeight,
+          };
+          var mousePosition = d3.mouse(this);
+          var xPosition = mousePosition[0]-20;
+          var yPosition = mousePosition[1]+160;
+          if(screen_size.width < 1000){
+              yPosition += 100;
+          }
+          if(screen_size.width < 769){
+              yPosition += 100;
+          }
+          if(screen_size.width < 360){
+              yPosition += 200;
+          }
+          d3.select("#showData")
+          .style("left",xPosition+"px")
+          .style("top",yPosition+"px");
+          d3.select("#showDataValue").html("<strong>"+d.name + "(" + format(d.value)+")</strong><br>"+d.source.name + " -> " + d.target.name);
+          d3.select("#showData").classed("hidden",false);
+      })
+      .on("mouseout",function(){
+          d3.select("#showData").classed("hidden",true);
+      });
 
     link.append("title")
       .text(function(d) { return d.name +'('+d.source.name + " -> " + d.target.name + ")" + format(d.value); });
