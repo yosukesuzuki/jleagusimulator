@@ -92,7 +92,22 @@
         {{page.content|safe}}
     </div>
 </div>
-
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">チーム別 移籍詳細</h4>
+      </div>
+      <div class="modal-body" id="myModalBody">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 {% endblock %}
 {%block scripts%}
 <script src="http://d3js.org/d3.v3.min.js"></script>
@@ -109,10 +124,13 @@ var j2_player_default = 33;
 var margin = {top: 1, right: 1, bottom: 6, left: 1},
     width = 630 - margin.left - margin.right,
     height = 1100 - margin.top - margin.bottom;
-
+var screen_size = {
+    width: window.innerWidth || document.body.clientWidth,
+    height: window.innerHeight || document.body.clientHeight,
+};
 var formatNumber = d3.format(",.0f"),
-    format = function(d) { return formatNumber(d); },
-    color = d3.scale.category20();
+format = function(d) { return formatNumber(d); },
+color = d3.scale.category20();
 
 True=true;
 False=false;
@@ -267,10 +285,7 @@ function drawChart(){
       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
       .sort(function(a, b) { return b.dy - a.dy; })
       .on("mouseover",function(d){
-          var screen_size = {
-              width: window.innerWidth || document.body.clientWidth,
-              height: window.innerHeight || document.body.clientHeight,
-          };
+
           var mousePosition = d3.mouse(this);
           var xPosition = mousePosition[0]-20;
           var yPosition = mousePosition[1]+160;
@@ -354,7 +369,13 @@ function showTeamDetail(d){
     });
     //console.log(out_players);
     //console.log(in_players);
-    $('#trade-detail').html('<table class="table table-condensed"><caption>'+d.name+'</caption>'+out_players+in_players+'</table>');
+    var table_string = '<table class="table table-condensed"><caption>'+d.name+'</caption>'+out_players+in_players+'</table>';
+    if(screen_size.width > 992){
+        $('#trade-detail').html(table_string);
+    }else{
+        $('#myModalBody').html(table_string);
+        $('#myModal').modal('show');
+    }
 }
 $('#redraw').on('click',function(){
     $('#chart').remove();
