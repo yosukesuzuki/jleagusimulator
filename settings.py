@@ -28,7 +28,7 @@ DEFAULT_LANG = 'ja'
 
 MIDDLEWARE_CLASSES = (
         'kay.auth.middleware.AuthenticationMiddleware',
-        'kay.sessions.middleware.SessionMiddleware',
+#        'kay.sessions.middleware.SessionMiddleware',
         'kay.utils.flash.FlashMiddleware',
         'kay.ext.appstats.middleware.AppStatsMiddleware',
 )
