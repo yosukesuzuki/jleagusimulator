@@ -283,8 +283,8 @@ function drawChart(){
       .attr("class", "link")
       .attr("d", path)
       .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-      .sort(function(a, b) { return b.dy - a.dy; })
-      .on("mouseover",function(d){
+      .sort(function(a, b) { return b.dy - a.dy; });
+/*      .on("mouseover",function(d){
 
           var mousePosition = d3.mouse(this);
           var xPosition = mousePosition[0]-20;
@@ -306,7 +306,7 @@ function drawChart(){
       })
       .on("mouseout",function(){
           d3.select("#showData").classed("hidden",true);
-      });
+      });*/
 
     link.append("title")
       .text(function(d) { return d.name +'('+d.source.name + " -> " + d.target.name + ")" + format(d.value); });
